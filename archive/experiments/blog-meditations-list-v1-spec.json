@@ -1,0 +1,137 @@
+{
+  "components": [
+    {
+      "name": "Header",
+      "type": "section",
+      "bbox": [
+        0,
+        0,
+        768,
+        80
+      ],
+      "repeats": false,
+      "instance_count": 1,
+      "reasoning": "Standard mobile header with back button, title, and action button",
+      "elements": [
+        {
+          "name": "BackButton",
+          "type": "IconButton",
+          "bbox": [
+            16,
+            30,
+            56,
+            70
+          ],
+          "reasoning": "Left-aligned icon button - standard back navigation pattern"
+        },
+        {
+          "name": "ScreenTitle",
+          "type": "Text",
+          "bbox": [
+            200,
+            35,
+            568,
+            65
+          ],
+          "reasoning": "Center-aligned title text - 'Meditations' or similar"
+        },
+        {
+          "name": "ActionButton",
+          "type": "IconButton",
+          "bbox": [
+            712,
+            30,
+            752,
+            70
+          ],
+          "reasoning": "Right-aligned action button - filter/search/menu"
+        }
+      ]
+    },
+    {
+      "name": "MeditationArticleCard",
+      "type": "component",
+      "bbox": [
+        16,
+        100,
+        752,
+        440
+      ],
+      "repeats": true,
+      "instance_count": 3,
+      "reasoning": "\n            PATTERN RECOGNITION: Blog/Article Card\n            \n            Visual cues:\n            - Large hero image (suggests visual content)\n            - Title + excerpt text (suggests article/blog)\n            - Metadata row at bottom (author/time - blog pattern)\n            - Rounded corners with elevation (card affordance)\n            - Repeats vertically (list item pattern)\n            \n            Component naming:\n            - Not \"Card1\", \"Card2\", \"Card3\" \u2192 Generic \"MeditationArticleCard\"\n            - Reusable component used 3 times\n            - Content varies (different images/text) but structure identical\n            ",
+      "elements": [
+        {
+          "name": "FeaturedImage",
+          "type": "Image",
+          "bbox": [
+            16,
+            100,
+            752,
+            300
+          ],
+          "reasoning": "Large featured image - blog post hero image with rounded corners"
+        },
+        {
+          "name": "ArticleTitle",
+          "type": "Text",
+          "bbox": [
+            32,
+            316,
+            736,
+            360
+          ],
+          "reasoning": "Bold title text - article headline (2 lines max)"
+        },
+        {
+          "name": "ArticleExcerpt",
+          "type": "Text",
+          "bbox": [
+            32,
+            368,
+            736,
+            408
+          ],
+          "reasoning": "Lighter body text - article description/excerpt"
+        },
+        {
+          "name": "MetadataRow",
+          "type": "View",
+          "bbox": [
+            32,
+            416,
+            736,
+            436
+          ],
+          "reasoning": "Horizontal row with author, date, read time - common blog metadata pattern"
+        }
+      ]
+    },
+    {
+      "name": "BottomTabBar",
+      "type": "section",
+      "bbox": [
+        0,
+        1286,
+        768,
+        1376
+      ],
+      "repeats": false,
+      "instance_count": 1,
+      "reasoning": "Optional: Standard bottom tab navigation - user can confirm if present",
+      "elements": [
+        {
+          "name": "TabButton",
+          "type": "TouchableOpacity",
+          "bbox": [
+            50,
+            1306,
+            150,
+            1356
+          ],
+          "reasoning": "Tab button with icon + label - repeats 4-5 times across bottom"
+        }
+      ]
+    }
+  ]
+}

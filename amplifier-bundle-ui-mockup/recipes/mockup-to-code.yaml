@@ -1,0 +1,205 @@
+---
+recipe:
+  name: mockup-to-code-pipeline
+  version: 1.0.0
+  description: Complete mockup-to-code workflow with human approval gates at key decision points
+
+# Staged recipe for human-in-loop validation
+type: staged
+
+# Input context variables
+context:
+  mockup_path: ""                    # Path to original mockup PNG
+  target_framework: "html"           # html, react, vue, etc.
+  output_dir: "./output"             # Where to generate code
+  iteration_count: 0                 # Track refinement iterations
+
+# Workflow stages with approval gates
+stages:
+  # Stage 1: Blueprint Generation
+  - name: blueprint-generation
+    requires_approval: true
+    approval_prompt: |
+      Blueprint analysis complete. Review the generated blueprint and design tokens.
+      
+      Files created:
+      - Blueprint PNG with semantic annotations
+      - Component specification JSON
+      - Design tokens extracted
+      
+      Ready to proceed with font matching?
+    steps:
+      - agent: ui-mockup:mockup-analyzer
+        instruction: |
+          Analyze the mockup at {{mockup_path}} and generate a comprehensive blueprint.
+          
+          Use multi-pass extraction:
+          1. Semantic structure and component hierarchy
+          2. Container relationships and spacing
+          3. Design tokens (colors, typography, spacing, effects)
+          4. Visual asset catalog (images, icons)
+          
+          Load the icon-finding and font-matching skills as needed.
+          
+          Output everything to {{output_dir}}/analysis/
+        output_key: blueprint
+
+  # Stage 2: Font Matching
+  - name: font-matching
+    requires_approval: true
+    approval_prompt: |
+      Font search complete.
+      
+      Display font: {{font_results.display_font.winner}}
+      Body font: {{font_results.body_font.winner}}
+      
+      Confidence: Display {{font_results.display_font.confidence}}%, Body {{font_results.body_font.confidence}}%
+      
+      Review the font comparison pages and approve to continue with implementation.
+    steps:
+      - agent: ui-mockup:font-matcher
+        instruction: |
+          Find Google Fonts matches for the fonts in {{mockup_path}}.
+          
+          Use systematic search across all Google Fonts:
+          1. Identify display font (serif/sans for titles)
+          2. Identify body font (sans for text/UI)
+          3. Create batch comparisons (20 fonts per page)
+          4. VLM ranking to narrow to finalists
+          5. Finals comparison for winner
+          
+          Output font comparison pages to {{output_dir}}/fonts/
+        output_key: font_results
+
+  # Stage 3: Implementation
+  - name: implementation
+    requires_approval: true
+    approval_prompt: |
+      Implementation complete using {{target_framework}}.
+      
+      Files created in {{output_dir}}/{{target_framework}}/
+      
+      Ready to start validation and refinement?
+    steps:
+      - agent: foundation:modular-builder
+        instruction: |
+          Implement the mockup using {{target_framework}} based on:
+          
+          Blueprint: {{blueprint}}
+          Fonts: {{font_results}}
+          Design tokens: {{output_dir}}/analysis/design-tokens.json
+          
+          Output to: {{output_dir}}/{{target_framework}}/
+          
+          Build incrementally:
+          1. Set up design tokens (Tailwind config if applicable)
+          2. Import fonts and icons
+          3. Build layout structure
+          4. Implement components one by one
+          5. Verify each component before moving to next
+        output_key: implementation_result
+
+  # Stage 4: Visual Validation (automatic, no approval needed)
+  - name: validation
+    requires_approval: false
+    steps:
+      - agent: ui-mockup:implementation-validator
+        instruction: |
+          Validate implementation against original mockup through iteration loop.
+          
+          Original: {{mockup_path}}
+          Implementation URL: {{implementation_result.demo_url}}
+          
+          Process:
+          1. Capture screenshot at same viewport as original
+          2. Create comparison images (side-by-side, overlay, heatmap)
+          3. VLM identifies #1 most significant issue
+          4. Apply fix
+          5. Re-validate
+          6. Repeat until match >85%
+          
+          Target: 85-90% match for this stage
+        output_key: validation_result
+
+  # Stage 5: Refinement Loop (iterates until >95% match or user stops)
+  - name: refinement
+    requires_approval: true
+    approval_prompt: |
+      Refinement iteration {{iteration_count}} complete.
+      
+      Match percentage: {{refinement_result.match_percentage}}%
+      Issues fixed: {{refinement_result.issues_fixed}}
+      Contradictions detected: {{refinement_result.contradictions_detected}}
+      
+      {{#if refinement_result.contradictions_detected}}
+      ⚠️ Contradictions found - review and approve suggested fixes.
+      {{/if}}
+      
+      Continue refinement? (Stop if satisfied with current match)
+    condition: "{{validation_result.match_percentage}} < 95"
+    steps:
+      - agent: ui-mockup:detail-refiner
+        instruction: |
+          Fine-tune implementation with verification loops.
+          
+          Original: {{mockup_path}}
+          Current: {{implementation_result.demo_url}}
+          
+          Process:
+          1. Comparative checklist (identify issues)
+          2. Verification against original ONLY
+          3. Detect contradictions
+          4. Present contradictions for human approval
+          5. Apply verified fixes
+          6. Re-validate
+          
+          Stop when: match >95% OR user satisfied OR iteration_count >5
+        output_key: refinement_result
+        update_context:
+          iteration_count: "{{iteration_count + 1}}"
+      
+      # Re-validate after refinement
+      - agent: ui-mockup:implementation-validator
+        instruction: |
+          Re-validate after refinement iteration.
+          
+          Capture new screenshot and compare to original.
+          Report new match percentage.
+        output_key: validation_result
+
+  # Stage 6: Final Assets (if match >90%)
+  - name: final-assets
+    requires_approval: true
+    approval_prompt: |
+      Match achieved: {{validation_result.match_percentage}}%
+      
+      Ready to generate production assets?
+      - Replace placeholder images with Nano Banana Pro versions
+      - Optimize icon sizes
+      - Export final code
+    condition: "{{validation_result.match_percentage}} >= 90"
+    steps:
+      - agent: foundation:modular-builder
+        instruction: |
+          Generate production-ready assets.
+          
+          1. Use Nano Banana Pro to regenerate all images:
+             - Hero backgrounds
+             - Thumbnails (matching aesthetic)
+             - Any other visual assets
+          
+          2. Optimize code:
+             - Remove debug comments
+             - Minify if applicable
+             - Add production build config
+          
+          3. Export final package to {{output_dir}}/production/
+
+# Recipe outputs (available after completion)
+outputs:
+  blueprint: "{{blueprint}}"
+  fonts: "{{font_results}}"
+  validation: "{{validation_result}}"
+  refinement: "{{refinement_result}}"
+  implementation_path: "{{output_dir}}/production/"
+  final_match_percentage: "{{validation_result.match_percentage}}"

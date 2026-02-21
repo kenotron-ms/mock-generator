@@ -1,0 +1,19 @@
+{
+  "focus_bbox": {
+    "x": 50,
+    "y": 610,
+    "width": 300,
+    "height": 40
+  },
+  "element_type": "text",
+  "semantic_name": "AuthorInfo",
+  "text_color": "white",
+  "has_gradient": true,
+  "edge_threshold_low": 60,
+  "edge_threshold_high": 180,
+  "min_width": 80,
+  "max_width": 300,
+  "min_height": 20,
+  "max_height": 50,
+  "reasoning": "VLM sees small text below title - likely author name 'By [Author Name]'. White text on gradient, single line, left-aligned."
+}

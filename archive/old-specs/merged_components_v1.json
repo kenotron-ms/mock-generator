@@ -1,0 +1,105 @@
+{
+  "image": "mockups/blog-meditations-list-v1.png",
+  "dimensions": {
+    "width": 768,
+    "height": 1376
+  },
+  "components": [
+    {
+      "name": "HeroArticleCard",
+      "bbox": {
+        "x": 34,
+        "y": 215,
+        "width": 701,
+        "height": 527
+      },
+      "source_regions": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "repeats": false,
+      "instance_count": 1,
+      "reasoning": "The large top card with 'On Creative Constraints' - merging the container and all child regions (image, title, text, metadata). This is the featured article with geometric background."
+    },
+    {
+      "name": "ArticleCardSmall",
+      "bbox": {
+        "x": 57,
+        "y": 980,
+        "width": 655,
+        "height": 197
+      },
+      "source_regions": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "repeats": true,
+      "instance_count": 2,
+      "reasoning": "Second card showing 'The Power of Simplicity' - smaller format with thumbnail image on left, text on right. This pattern repeats for list items."
+    },
+    {
+      "name": "ArticleCardSmall",
+      "bbox": {
+        "x": 268,
+        "y": 1057,
+        "width": 351,
+        "height": 49
+      },
+      "source_regions": [
+        32,
+        33,
+        34,
+        35
+      ],
+      "repeats": true,
+      "instance_count": 2,
+      "reasoning": "Third card showing 'Building in Public' - same pattern as above card. Second instance of the repeating article card pattern."
+    },
+    {
+      "name": "HeaderNav",
+      "bbox": {
+        "x": 267,
+        "y": 796,
+        "width": 186,
+        "height": 89
+      },
+      "source_regions": [
+        55,
+        56,
+        57
+      ],
+      "repeats": false,
+      "instance_count": 1,
+      "reasoning": "Top navigation bar with 'Meditations' title and Blog/Explore tabs. Standard app header pattern."
+    },
+    {
+      "name": "BottomNavBar",
+      "bbox": {
+        "x": 231,
+        "y": 43,
+        "width": 341,
+        "height": 1264
+      },
+      "source_regions": [
+        64,
+        65,
+        66,
+        67,
+        68
+      ],
+      "repeats": false,
+      "instance_count": 1,
+      "reasoning": "Bottom navigation with explore, meditations, and browse icons. Standard mobile bottom tab bar."
+    }
+  ]
+}

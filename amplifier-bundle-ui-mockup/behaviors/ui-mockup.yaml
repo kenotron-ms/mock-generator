@@ -1,0 +1,21 @@
+---
+bundle:
+  name: ui-mockup-behavior
+  version: 1.0.0
+  description: Mockup-to-code pipeline with VLM-guided analysis and systematic refinement
+
+# Add the nano-banana tool as a dependency
+tools:
+  - module: tool-nano-banana
+    source: git+https://github.com/kenotron-ms/amplifier-module-tool-nano-banana@main
+
+# Declare our specialist agents
+agents:
+  mockup-analyzer: ui-mockup:agents/mockup-analyzer
+  font-matcher: ui-mockup:agents/font-matcher
+  detail-refiner: ui-mockup:agents/detail-refiner
+  implementation-validator: ui-mockup:agents/implementation-validator
+
+# Inject thin awareness pointer into root sessions
+context:
+  - ui-mockup:context/ui-mockup-awareness.md

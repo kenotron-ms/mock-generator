@@ -1,0 +1,19 @@
+{
+  "focus_bbox": {
+    "x": 50,
+    "y": 520,
+    "width": 400,
+    "height": 80
+  },
+  "element_type": "text",
+  "semantic_name": "TitleText",
+  "text_color": "white",
+  "has_gradient": true,
+  "edge_threshold_low": 60,
+  "edge_threshold_high": 180,
+  "min_width": 200,
+  "max_width": 400,
+  "min_height": 30,
+  "max_height": 100,
+  "reasoning": "VLM sees large white text 'On Creative Constraints' overlaid on geometric background in bottom-left of hero card. Text appears around y=520-600. Gradient background requires higher edge threshold for text detection."
+}

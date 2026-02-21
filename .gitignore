@@ -51,3 +51,6 @@ htmlcov/
 # Amplifier
 .amplifier/sessions/
 .amplifier/projects/
+
+# Local development repos (use as dependencies, not included in commits)
+amplifier-module-tool-nano-banana/

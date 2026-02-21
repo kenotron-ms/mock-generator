@@ -1,0 +1,18 @@
+{
+  "focus_bbox": {
+    "x": 34,
+    "y": 215,
+    "width": 701,
+    "height": 400
+  },
+  "element_type": "image",
+  "semantic_name": "BackgroundImage",
+  "has_gradient": true,
+  "has_shadow": false,
+  "edge_threshold_low": 30,
+  "edge_threshold_high": 100,
+  "fills_parent_ratio": 0.85,
+  "min_width": 600,
+  "min_height": 300,
+  "reasoning": "VLM sees colorful geometric background with gradients filling the top portion of the hero card"
+}

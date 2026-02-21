@@ -1,0 +1,322 @@
+{
+  "image": "mockups/blog-meditations-list-v1.png",
+  "dimensions": {
+    "width": 768,
+    "height": 1376
+  },
+  "component_tree": [
+    {
+      "name": "HeroArticleCard",
+      "bbox": {
+        "x": 34,
+        "y": 215,
+        "width": 701,
+        "height": 527
+      },
+      "type": "element",
+      "repeats": false,
+      "children": [
+        {
+          "name": "BackgroundImage",
+          "bbox": {
+            "x": 34,
+            "y": 215,
+            "width": 701,
+            "height": 400
+          },
+          "type": "image",
+          "repeats": false
+        },
+        {
+          "name": "TitleText",
+          "bbox": {
+            "x": 50,
+            "y": 520,
+            "width": 400,
+            "height": 80
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "AuthorInfo",
+          "bbox": {
+            "x": 50,
+            "y": 610,
+            "width": 250,
+            "height": 40
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "MetricsRow",
+          "bbox": {
+            "x": 50,
+            "y": 660,
+            "width": 300,
+            "height": 50
+          },
+          "type": "element",
+          "repeats": false
+        }
+      ]
+    },
+    {
+      "name": "ArticleCard",
+      "bbox": {
+        "x": 57,
+        "y": 980,
+        "width": 655,
+        "height": 197
+      },
+      "type": "element",
+      "repeats": false,
+      "children": [
+        {
+          "name": "ThumbnailImage",
+          "bbox": {
+            "x": 57,
+            "y": 980,
+            "width": 140,
+            "height": 140
+          },
+          "type": "image",
+          "repeats": false
+        },
+        {
+          "name": "TitleText",
+          "bbox": {
+            "x": 210,
+            "y": 997,
+            "width": 490,
+            "height": 50
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "DescriptionText",
+          "bbox": {
+            "x": 210,
+            "y": 1052,
+            "width": 490,
+            "height": 60
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "MetadataRow",
+          "bbox": {
+            "x": 210,
+            "y": 1122,
+            "width": 490,
+            "height": 35
+          },
+          "type": "element",
+          "repeats": false
+        }
+      ]
+    },
+    {
+      "name": "ArticleCard",
+      "bbox": {
+        "x": 57,
+        "y": 763,
+        "width": 655,
+        "height": 197
+      },
+      "type": "element",
+      "repeats": false,
+      "children": [
+        {
+          "name": "ThumbnailImage",
+          "bbox": {
+            "x": 57,
+            "y": 763,
+            "width": 140,
+            "height": 140
+          },
+          "type": "image",
+          "repeats": false
+        },
+        {
+          "name": "TitleText",
+          "bbox": {
+            "x": 210,
+            "y": 780,
+            "width": 490,
+            "height": 50
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "DescriptionText",
+          "bbox": {
+            "x": 210,
+            "y": 835,
+            "width": 490,
+            "height": 60
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "MetadataRow",
+          "bbox": {
+            "x": 210,
+            "y": 905,
+            "width": 490,
+            "height": 35
+          },
+          "type": "element",
+          "repeats": false
+        },
+        {
+          "name": "ThumbnailImage",
+          "bbox": {
+            "x": 57,
+            "y": 763,
+            "width": 140,
+            "height": 140
+          },
+          "type": "image",
+          "repeats": false
+        },
+        {
+          "name": "TitleText",
+          "bbox": {
+            "x": 210,
+            "y": 780,
+            "width": 490,
+            "height": 50
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "DescriptionText",
+          "bbox": {
+            "x": 210,
+            "y": 835,
+            "width": 490,
+            "height": 60
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "MetadataRow",
+          "bbox": {
+            "x": 210,
+            "y": 905,
+            "width": 490,
+            "height": 35
+          },
+          "type": "element",
+          "repeats": false
+        }
+      ]
+    },
+    {
+      "name": "AppHeader",
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 72
+      },
+      "type": "element",
+      "repeats": false,
+      "children": [
+        {
+          "name": "AppTitle",
+          "bbox": {
+            "x": 280,
+            "y": 20,
+            "width": 200,
+            "height": 40
+          },
+          "type": "text",
+          "repeats": false
+        },
+        {
+          "name": "BlogTab",
+          "bbox": {
+            "x": 150,
+            "y": 25,
+            "width": 80,
+            "height": 35
+          },
+          "type": "button",
+          "repeats": false
+        },
+        {
+          "name": "ExploreTab",
+          "bbox": {
+            "x": 530,
+            "y": 25,
+            "width": 100,
+            "height": 35
+          },
+          "type": "button",
+          "repeats": false
+        }
+      ]
+    },
+    {
+      "name": "BottomNavBar",
+      "bbox": {
+        "x": 0,
+        "y": 1312,
+        "width": 768,
+        "height": 64
+      },
+      "type": "element",
+      "repeats": false,
+      "children": [
+        {
+          "name": "ExploreNavItem",
+          "bbox": {
+            "x": 100,
+            "y": 1320,
+            "width": 80,
+            "height": 50
+          },
+          "type": "button",
+          "repeats": false
+        },
+        {
+          "name": "MeditationsNavItem",
+          "bbox": {
+            "x": 344,
+            "y": 1320,
+            "width": 80,
+            "height": 50
+          },
+          "type": "button",
+          "repeats": false
+        },
+        {
+          "name": "BrowseNavItem",
+          "bbox": {
+            "x": 588,
+            "y": 1320,
+            "width": 80,
+            "height": 50
+          },
+          "type": "button",
+          "repeats": false
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "total_components": 27,
+    "max_depth": 1,
+    "unnamed_removed": 61,
+    "extraction_iterations": 29
+  }
+}

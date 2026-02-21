@@ -1,0 +1,349 @@
+{
+  "image": "mockups/blog-meditations-list-v1.png",
+  "dimensions": {"width": 768, "height": 1376},
+  "approach": "Paper Layering + Designer Precision + Layout Strategy",
+  "grid_system": "8px base grid",
+  
+  "components": [
+    {
+      "name": "AppHeader",
+      "type": "Container",
+      "layout": "Column",
+      "bbox": {"x": 0, "y": 0, "width": 768, "height": 192},
+      "props": {
+        "backgroundColor": "#FEFEFE",
+        "padding": "16px 0"
+      },
+      "children": [
+        {
+          "name": "MeditationsTitle",
+          "type": "Text",
+          "bbox": {"x": 232, "y": 32, "width": 304, "height": 104},
+          "props": {
+            "text": "Meditations",
+            "fontSize": 64,
+            "fontFamily": "Serif",
+            "textAlign": "center",
+            "color": "#1A1A1A"
+          },
+          "designer_note": "Center-aligned: (768-304)/2 = 232px. Height=104 for large display font with line-height."
+        },
+        {
+          "name": "TabBar",
+          "type": "Container",
+          "layout": "Row",
+          "bbox": {"x": 272, "y": 136, "width": 224, "height": 56},
+          "props": {
+            "justifyContent": "space-between"
+          },
+          "children": [
+            {
+              "name": "BlogTab",
+              "type": "Button",
+              "bbox": {"x": 272, "y": 136, "width": 72, "height": 56},
+              "props": {
+                "text": "Blog",
+                "active": true,
+                "borderBottom": "2px solid #D4806F"
+              }
+            },
+            {
+              "name": "ExploreTab",
+              "type": "Button",
+              "bbox": {"x": 424, "y": 136, "width": 72, "height": 56},
+              "props": {
+                "text": "Explore",
+                "active": false,
+                "color": "#888888"
+              },
+              "designer_note": "24px spacing between tabs: 272+72+80(space)+424"
+            }
+          ]
+        }
+      ]
+    },
+    
+    {
+      "name": "HeroArticleCard",
+      "type": "Card",
+      "layout": "Stack",
+      "bbox": {"x": 32, "y": 216, "width": 704, "height": 528},
+      "props": {
+        "borderRadius": "16px",
+        "elevation": 2
+      },
+      "layers": [
+        {
+          "z": 0,
+          "name": "BackgroundImage",
+          "type": "Image",
+          "bbox": {"x": 32, "y": 216, "width": 704, "height": 528},
+          "props": {
+            "source": "geometric-art.jpg",
+            "resizeMode": "cover",
+            "position": "absolute"
+          },
+          "fills_parent": true,
+          "designer_note": "Background fills entire card. Geometric pattern with warm colors."
+        },
+        {
+          "z": 1,
+          "name": "ContentOverlay",
+          "type": "Container",
+          "layout": "Column",
+          "bbox": {"x": 80, "y": 592, "width": 640, "height": 144},
+          "props": {
+            "padding": "0",
+            "position": "absolute"
+          },
+          "children": [
+            {
+              "name": "TitleText",
+              "type": "Text",
+              "bbox": {"x": 80, "y": 592, "width": 640, "height": 88},
+              "props": {
+                "text": "On Creative Constraints",
+                "fontSize": 40,
+                "lineHeight": 1.1,
+                "fontWeight": "600",
+                "color": "#FFFFFF",
+                "maxLines": 2
+              },
+              "designer_note": "2 lines × 40px × 1.1 line-height = 88px. Full enclosure. 48px padding from card edge."
+            },
+            {
+              "name": "MetadataRow",
+              "type": "Container",
+              "layout": "Row",
+              "bbox": {"x": 80, "y": 688, "width": 400, "height": 48},
+              "props": {
+                "gap": "16px",
+                "alignItems": "center"
+              },
+              "children": [
+                {
+                  "name": "PublishDate",
+                  "type": "Text",
+                  "bbox": {"x": 80, "y": 696, "width": 160, "height": 32},
+                  "props": {
+                    "text": "Feb 10, 2026",
+                    "fontSize": 14,
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  }
+                },
+                {
+                  "name": "ReadTime",
+                  "type": "Text",
+                  "bbox": {"x": 256, "y": 696, "width": 80, "height": 32},
+                  "props": {
+                    "text": "4 min read",
+                    "fontSize": 14,
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  }
+                }
+              ],
+              "designer_note": "8px spacing below title. Metadata elements horizontally arranged."
+            }
+          ]
+        }
+      ]
+    },
+    
+    {
+      "name": "ArticleCard",
+      "type": "Card",
+      "layout": "Row",
+      "bbox": {"x": 56, "y": 760, "width": 656, "height": 200},
+      "repeats": true,
+      "instance_number": 1,
+      "props": {
+        "backgroundColor": "#FFFFFF",
+        "borderRadius": "12px",
+        "padding": "16px",
+        "gap": "24px"
+      },
+      "children": [
+        {
+          "name": "ThumbnailImage",
+          "type": "Image",
+          "bbox": {"x": 72, "y": 776, "width": 160, "height": 160},
+          "props": {
+            "source": "leaf-photo.jpg",
+            "borderRadius": "8px",
+            "aspectRatio": "1:1"
+          },
+          "designer_note": "16px padding from card edge. 160×160 standard thumbnail size."
+        },
+        {
+          "name": "TextContent",
+          "type": "Container",
+          "layout": "Column",
+          "bbox": {"x": 256, "y": 776, "width": 440, "height": 168},
+          "props": {
+            "justifyContent": "space-between"
+          },
+          "children": [
+            {
+              "name": "TitleText",
+              "type": "Text",
+              "bbox": {"x": 256, "y": 784, "width": 440, "height": 48},
+              "props": {
+                "text": "The Power of Simplicity",
+                "fontSize": 20,
+                "lineHeight": 1.2,
+                "fontWeight": "600",
+                "color": "#1A1A1A"
+              },
+              "designer_note": "Single line title. 48px height includes line-height."
+            },
+            {
+              "name": "DescriptionText",
+              "type": "Text",
+              "bbox": {"x": 256, "y": 840, "width": 440, "height": 64},
+              "props": {
+                "text": "Exploring minimalism...",
+                "fontSize": 15,
+                "lineHeight": 1.4,
+                "color": "#666666",
+                "maxLines": 3
+              },
+              "designer_note": "3 lines × 15px × 1.4 = ~63px, rounded to 64px. 8px spacing from title."
+            },
+            {
+              "name": "MetadataPill",
+              "type": "Badge",
+              "bbox": {"x": 256, "y": 912, "width": 128, "height": 32},
+              "props": {
+                "text": "Feb 8 • 3 min",
+                "fontSize": 12,
+                "backgroundColor": "#E8DCC8",
+                "borderRadius": "16px",
+                "padding": "8px 16px"
+              },
+              "designer_note": "8px from description. 32px standard badge height."
+            }
+          ]
+        }
+      ]
+    },
+    
+    {
+      "name": "ArticleCard",
+      "type": "Card",
+      "layout": "Row",
+      "bbox": {"x": 56, "y": 976, "width": 656, "height": 200},
+      "repeats": true,
+      "instance_number": 2,
+      "note": "16px spacing between cards (760+200+16=976)",
+      "children": [
+        {
+          "name": "ThumbnailImage",
+          "type": "Image",
+          "bbox": {"x": 72, "y": 992, "width": 160, "height": 160},
+          "props": {"source": "pottery-photo.jpg", "borderRadius": "8px"}
+        },
+        {
+          "name": "TextContent",
+          "type": "Container",
+          "layout": "Column",
+          "bbox": {"x": 256, "y": 992, "width": 440, "height": 168},
+          "children": [
+            {
+              "name": "TitleText",
+              "type": "Text",
+              "bbox": {"x": 256, "y": 1000, "width": 440, "height": 48},
+              "props": {"text": "Building in Public", "fontSize": 20}
+            },
+            {
+              "name": "DescriptionText",
+              "type": "Text",
+              "bbox": {"x": 256, "y": 1056, "width": 440, "height": 64},
+              "props": {"fontSize": 15, "maxLines": 3}
+            },
+            {
+              "name": "MetadataPill",
+              "type": "Badge",
+              "bbox": {"x": 256, "y": 1128, "width": 128, "height": 32},
+              "props": {"text": "Feb 5 • 5 min", "backgroundColor": "#D4806F"}
+            }
+          ]
+        }
+      ]
+    },
+    
+    {
+      "name": "BottomNavBar",
+      "type": "Container",
+      "layout": "Row",
+      "bbox": {"x": 120, "y": 1224, "width": 528, "height": 104},
+      "props": {
+        "backgroundColor": "#FFFFFF",
+        "borderRadius": "52px",
+        "elevation": 4,
+        "padding": "16px",
+        "justifyContent": "space-around"
+      },
+      "note": "Pill-shaped floating nav container (not full-width)",
+      "children": [
+        {
+          "name": "ExploreNavItem",
+          "type": "Button",
+          "bbox": {"x": 176, "y": 1240, "width": 72, "height": 72},
+          "props": {
+            "icon": "compass",
+            "label": "Explore",
+            "active": false
+          }
+        },
+        {
+          "name": "MeditationsNavItem",
+          "type": "Button",
+          "bbox": {"x": 344, "y": 1240, "width": 72, "height": 72},
+          "props": {
+            "icon": "book",
+            "label": "Meditations",
+            "active": true
+          }
+        },
+        {
+          "name": "VoiceNavItem",
+          "type": "Button",
+          "bbox": {"x": 520, "y": 1240, "width": 72, "height": 72},
+          "props": {
+            "icon": "microphone",
+            "label": "Voice",
+            "active": false
+          }
+        }
+      ]
+    }
+  ],
+  
+  "self_review_checklist": {
+    "all_elements_found": true,
+    "header_elements": ["Meditations title", "Blog tab", "Explore tab"],
+    "hero_elements": ["Background image", "Title text", "Metadata"],
+    "article_elements": ["Thumbnail", "Title", "Description", "Metadata pill"],
+    "nav_elements": ["3 nav items in pill container"],
+    "text_fully_enclosed": true,
+    "hero_title_height": "88px (2 lines × 40px × 1.1 line-height)",
+    "article_description_height": "64px (3 lines × 15px × 1.4 line-height)",
+    "grid_aligned": true,
+    "all_coords_divisible_by_8": true,
+    "standard_spacing_used": true,
+    "margins": ["32px hero", "56px articles", "16px cards", "24px between elements"],
+    "bottom_nav_correction": "Recognized as pill-shaped floating container, not full-width bar",
+    "designer_would_approve": true
+  },
+  
+  "stats": {
+    "total_components": 5,
+    "total_elements": 20,
+    "max_depth": 2,
+    "layout_strategies": ["Stack", "Row", "Column"],
+    "approach_time": "Manual application of learned principles",
+    "unnamed_regions": 0
+  }
+}
