@@ -68,13 +68,15 @@ Match %
 
 ## Your Workflow
 
-### Step 1: Load the Skill
+### Step 1: Load the Skills
 
 ```
+load_skill('screenshot-comparison')
 load_skill('vlm-iteration')
 ```
 
-This skill contains the complete iteration loop pattern.
+The `screenshot-comparison` skill contains the three-stage pattern for visual analysis.
+The `vlm-iteration` skill contains the complete iteration loop pattern.
 
 ### Step 2: Capture Screenshot
 
@@ -101,37 +103,62 @@ def capture_screenshot(url, output_path, viewport_width=390):
 
 **CRITICAL:** Screenshot must be at SAME viewport size as original mockup!
 
-### Step 3: Create Comparison Images
+### Step 3: Create Side-by-Side Comparison
 
-**Generate three comparison types:**
+**First, create a clean side-by-side comparison using ImageMagick:**
 
-1. **Side-by-side** - Original left, current right
-2. **50% overlay** - Blend for direct comparison
-3. **Difference heatmap** - Green=match, red=different
-
-```python
-# Side-by-side
-create_side_by_side(original, screenshot, "compare-side.png")
-
-# Overlay
-create_overlay(original, screenshot, "compare-overlay.png", opacity=0.5)
-
-# Heatmap
-create_heatmap(original, screenshot, "compare-heatmap.png")
+```bash
+# Create side-by-side layout
+magick montage original_mockup.png current_screenshot.png \
+  -geometry +10+10 \
+  -background white \
+  compare_sxs.png
 ```
 
-### Step 4: VLM Analysis
+**Output:** `compare_sxs.png` - Clean side-by-side (Original left | Current right)
 
-**Ask Nano Banana Pro VLM:**
+### Step 4: Generate Visual Annotations
+
+**Use Nano Banana Pro to add overlay annotations ON TOP of the comparison:**
+
+```bash
+amplifier tool invoke nano-banana \
+  operation=generate \
+  reference_image_path=compare_sxs.png \
+  output_path=compare_annotated.png \
+  'prompt=TAKE THIS IMAGE showing side-by-side comparison and ADD OVERLAY ANNOTATIONS:
+
+- RED circles/arrows pointing to areas that DO NOT MATCH (with text labels)
+- GREEN checkmarks on areas that DO MATCH well
+- Yellow warnings for areas CLOSE but not exact
+- Text callouts explaining differences (e.g., "Missing blur", "Wrong icon")
+- Percentage indicators per region (e.g., "Weather Card: 60% match")
+
+Make annotations CLEARLY VISIBLE:
+- Semi-transparent overlays where needed
+- Bold text with drop shadows
+- Bright saturated RED, GREEN, YELLOW colors' \
+  aspect_ratio=preserve \
+  resolution=2K \
+  use_thinking=true
+```
+
+**CRITICAL:** Use `reference_image_path` (not `reference_image`) to ensure annotations are added to the existing image.
+
+**Output:** `compare_annotated.png` - Side-by-side WITH visual markup overlay
+
+### Step 4: VLM Analysis of Annotated Comparison
+
+**Ask Nano Banana Pro VLM to read the annotated comparison:**
 
 ```
-You are analyzing mockup implementation progress.
+You are analyzing a mockup implementation comparison that has been visually annotated.
 
-Original mockup: [original.png]
-Current implementation: [screenshot.png]
-Comparison views: [side-by-side.png, overlay.png, heatmap.png]
+Input: [comparison-annotated.png] - Shows original (left) and implementation (right) with visual annotations
 
-Task: Identify the #1 MOST SIGNIFICANT difference that reduces visual match.
+The image already has RED markers showing differences and GREEN markers showing matches.
+
+Task: Based on the visual annotations, identify the #1 MOST SIGNIFICANT difference that reduces visual match.
 
 Output JSON:
 {

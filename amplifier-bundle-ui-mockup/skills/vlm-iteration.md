@@ -79,81 +79,66 @@ def capture_screenshot(url, output_path, viewport_width=390):
 
 ---
 
-### Step 2: Create Comparison Images
+### Step 2: Generate Annotated Comparison with Nano Banana Pro
 
-**Side-by-side comparison:**
+**Use Nano Banana Pro IMAGE GENERATION to create a visual comparison with annotations:**
+
 ```python
-from PIL import Image
+# Use Nano Banana Pro (image generation capability)
+prompt = """
+Create a visual comparison analysis of these two UI screenshots.
 
-def create_side_by_side(original_path, current_path, output_path):
-    """Place images side-by-side for visual comparison."""
-    original = Image.open(original_path)
-    current = Image.open(current_path)
-    
-    # Ensure same height
-    if original.height != current.height:
-        current = current.resize((
-            int(current.width * original.height / current.height),
-            original.height
-        ))
-    
-    # Create combined image
-    combined = Image.new('RGB', (original.width + current.width, original.height))
-    combined.paste(original, (0, 0))
-    combined.paste(current, (original.width, 0))
-    combined.save(output_path)
+LEFT: Original mockup (the target design)
+RIGHT: Current implementation (what was built)
+
+Place them side-by-side and ADD VISUAL ANNOTATIONS:
+- RED circles/arrows pointing to DIFFERENCES (with labels)
+- GREEN checkmarks on elements that MATCH
+- Percentage overlay showing match quality in each region
+- Text callouts describing discrepancies (e.g., "Wrong width", "Missing shadow", "Color mismatch")
+- Heatmap-style color coding: green=match, yellow=close, red=significant difference
+
+Make the discrepancies OBVIOUS and VISUAL so they can be easily read.
+"""
+
+# Nano Banana Pro generates the annotated comparison image
+comparison_annotated = nano_banana_generator.generate(
+    prompt=prompt,
+    params={
+        "reference_image": [original_mockup, current_screenshot],  # Both images
+        "aspect_ratio": "16:9",  # Wide format for side-by-side
+        "resolution": "2K",
+        "use_thinking": True,
+    }
+)
+# Output: Single annotated image with visual markup
+# Saved as: comparison-annotated.png
 ```
 
-**50% overlay blend:**
-```python
-def create_overlay(original_path, current_path, output_path, opacity=0.5):
-    """Blend original and current for direct overlay comparison."""
-    original = Image.open(original_path).convert('RGBA')
-    current = Image.open(current_path).convert('RGBA')
-    
-    # Resize if needed
-    if original.size != current.size:
-        current = current.resize(original.size)
-    
-    # Blend
-    blended = Image.blend(original, current, opacity)
-    blended.save(output_path)
-```
+**What Nano Banana Pro does:**
+- Takes both images as input
+- Generates a NEW image with side-by-side layout
+- Adds visual annotations (arrows, circles, text labels, color coding)
+- Highlights differences in RED
+- Marks matches in GREEN
+- Creates a single comprehensive comparison image
 
-**Difference heatmap:**
-```python
-from PIL import ImageChops
-
-def create_heatmap(original_path, current_path, output_path):
-    """Create pixel-difference heatmap (green=match, red=different)."""
-    original = Image.open(original_path).convert('RGB')
-    current = Image.open(current_path).convert('RGB')
-    
-    if original.size != current.size:
-        current = current.resize(original.size)
-    
-    # Calculate difference
-    diff = ImageChops.difference(original, current)
-    
-    # Convert to heatmap (implement color mapping)
-    # Green where pixels match, red where different
-    heatmap = create_heatmap_coloring(diff)
-    heatmap.save(output_path)
-```
+**Key distinction:** This is IMAGE GENERATION, not image analysis. Nano Banana Pro creates a visual artifact with markup.
 
 ---
 
-### Step 3: VLM Analysis
+### Step 3: VLM Analysis of Annotated Image
 
-**Prompt for comparison:**
+**Use Nano Banana Pro VLM (text/vision model) to READ the annotated comparison:**
+
 ```
-You are analyzing mockup implementation progress.
+You are analyzing a mockup implementation comparison that has been visually annotated.
 
-Original mockup: [original.png]
-Current implementation: [current-screenshot.png]
-Comparison views: [side-by-side.png, overlay.png, heatmap.png]
+Input: [comparison-annotated.png] - Shows original (left) and implementation (right) with visual annotations
 
-Task: Identify the #1 MOST SIGNIFICANT difference that reduces visual match.
+The image already has RED markers showing differences and GREEN markers showing matches.
+
+Task: Based on the visual annotations in the image, identify the #1 MOST SIGNIFICANT difference that reduces visual match.
 
 Output format:
 {
@@ -171,6 +156,12 @@ Output format:
 
 Pick ONE issue to fix. After fixing, we'll re-screenshot and compare again.
 ```
+
+**Key distinction:** This is TEXT ANALYSIS reading a visual image. The VLM reads the annotations that Nano Banana Pro generated.
+
+**Why this two-stage approach works better:**
+1. **Stage 1 (Nano Banana Pro generation):** Creates visual markup making differences explicit
+2. **Stage 2 (VLM analysis):** Reads the marked-up comparison and prioritizes fixes
 
 **Key principle:** ONE issue at a time, most significant first.
 

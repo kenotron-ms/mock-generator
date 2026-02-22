@@ -120,28 +120,62 @@ generator.generate(
 
 ---
 
-### ✅ Working Process: Visual Diff Analysis
+### ✅ Working Process: Visual Diff Analysis (Enhanced with Nano Banana Annotation)
 
 **Input:** Original mockup + current implementation screenshot
 
-**Tool:** `visual_diff_analysis.py` + `create_overlay_diff.py`
+**Tool:** Nano Banana Pro (image generation) → Nano Banana Pro (VLM analysis)
 
-**Method:**
-1. Take screenshot of implementation
-2. Create comparison images:
-   - Side-by-side
-   - 50% overlay blend
-   - Pixel difference heatmap (red = different, green = match)
-3. Feed comparison images to Nano Banana Pro VLM
-4. Get detailed diff report with specific fixes
+**Method (Two-Stage Process):**
+
+**Stage 1: Generate Annotated Comparison**
+```python
+prompt = """
+Create a visual comparison analysis of these two UI screenshots.
+
+LEFT: Original mockup (the target design)
+RIGHT: Current implementation (what was built)
+
+Place them side-by-side and ADD VISUAL ANNOTATIONS:
+- RED circles/arrows pointing to DIFFERENCES (with labels)
+- GREEN checkmarks on elements that MATCH
+- Percentage overlay showing match quality in each region
+- Text callouts describing discrepancies (e.g., "Wrong width", "Missing shadow", "Color mismatch")
+- Heatmap-style color coding: green=match, yellow=close, red=significant difference
+
+Make the discrepancies OBVIOUS and VISUAL so they can be easily read.
+"""
+
+comparison = generator.generate(
+    prompt=prompt,
+    params={
+        "reference_image": [original_mockup, current_screenshot],
+        "aspect_ratio": "16:9",
+        "resolution": "2K",
+        "use_thinking": True,
+    }
+)
+```
+
+**Stage 2: VLM Reads the Annotated Comparison**
+```python
+vlm_analysis = vlm.analyze(
+    image=comparison_annotated,
+    prompt="Based on the visual annotations, identify the #1 MOST SIGNIFICANT difference..."
+)
+```
+
+**Why This Works Better:**
+- Nano Banana's image generation creates visual markup (arrows, circles, text labels)
+- VLM reads the already-annotated comparison instead of doing raw pixel comparison
+- Combines Nano Banana's visual generation strength with VLM's text analysis strength
+- More reliable than asking VLM to compare two separate images
 
 **Output:** 
-- Visual comparison images
-- `output/visual-diff-report.json` with component-by-component analysis
+- Single annotated comparison image with visual discrepancy markup
+- `output/visual-diff-report.json` with prioritized fixes
 
-**Success Rate:** ✅ VLM can identify differences when shown both images
-
-**Key Metric:** Heatmap showed 0.3% match, 97.8% different (brutal honesty!)
+**Success Rate:** ✅ More reliable than VLM-only comparison - annotations make differences explicit
 
 ---
 
