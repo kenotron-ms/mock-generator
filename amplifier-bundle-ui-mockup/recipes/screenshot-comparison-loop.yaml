@@ -1,0 +1,294 @@
+# =============================================================================
+# Screenshot Comparison Convergence Loop Recipe
+# =============================================================================
+#
+# This recipe implements an iterative screenshot comparison workflow that 
+# converges to a target match percentage (default 95%). It uses visual
+# annotation tools (nano-banana) to identify discrepancies and guides the
+# developer through fixing them one priority at a time.
+#
+# Pattern: Convergence loop with human-in-loop fix application
+# Expected duration: 15-45 minutes depending on number of iterations needed
+#
+# =============================================================================
+# CHANGELOG
+# =============================================================================
+#
+# v1.0.0 (2026-02-21):
+#   - NEW FEATURE: Initial release of convergence loop pattern
+#   - Implements three-stage screenshot comparison (capture, annotate, analyze)
+#   - Uses while_condition for iteration control
+#   - Includes bash pause step for developer to apply fixes between iterations
+#   - Tracks match_percentage and iteration count in context
+#
+# =============================================================================
+
+name: "screenshot-comparison-loop"
+description: "Iterative screenshot comparison with convergence loop until implementation matches mockup (>95%)"
+version: "1.0.0"
+tags: 
+  - "screenshot-comparison"
+  - "visual-testing"
+  - "convergence-loop"
+  - "nano-banana"
+  - "human-in-loop"
+
+# =============================================================================
+# CONTEXT VARIABLES
+# =============================================================================
+context:
+  # Required inputs
+  original_mockup_path: ""          # Path to original mockup/design file
+  implementation_url: ""             # URL to capture (e.g., http://localhost:5173)
+  
+  # Optional configuration
+  viewport_width: "390"              # Viewport width for screenshot capture
+  viewport_height: "844"             # Viewport height for screenshot capture
+  target_match_percentage: "95"      # Stop when match reaches this threshold
+  max_iterations: "10"               # Safety limit to prevent infinite loops
+  
+  # Loop state variables (initialized)
+  iteration: "1"                     # Current iteration number
+  match_percentage: "0"              # Current match percentage from analysis
+
+# =============================================================================
+# CONVERGENCE LOOP STEP
+# =============================================================================
+# This is a single step that contains a multi-step loop body via while_steps.
+# The loop continues while match_percentage < target_match_percentage.
+# =============================================================================
+
+steps:
+  - id: "convergence-loop"
+    type: "bash"
+    command: "echo 'Starting iteration {{iteration}} (match: {{match_percentage}}%)'"
+    output: "loop_marker"
+    while_condition: "{{iteration}} <= {{max_iterations}} and {{match_percentage}} < {{target_match_percentage}}"
+    max_while_iterations: 10
+    update_context:
+      iteration: "{{loop_state.next_iteration}}"
+      match_percentage: "{{analysis_result.overall_match_percentage}}"
+    while_steps:
+      # =========================================================================
+      # LOOP STEP 1: Capture Screenshot
+      # =========================================================================
+      - id: "capture-screenshot"
+        type: "bash"
+        command: |
+          mkdir -p screenshots
+          npx playwright screenshot \
+            --viewport-size={{viewport_width}},{{viewport_height}} \
+            {{implementation_url}} \
+            screenshots/iteration_{{iteration}}.png
+          echo "screenshots/iteration_{{iteration}}.png"
+        output: "screenshot_path"
+        timeout: 300
+        
+      # =========================================================================
+      # LOOP STEP 2: Create Side-by-Side Comparison
+      # =========================================================================
+      - id: "create-side-by-side"
+        type: "bash"
+        command: |
+          mkdir -p compare
+          montage -geometry +0+0 -tile 2x1 -background white \
+            {{original_mockup_path}} \
+            {{screenshot_path}} \
+            compare/iteration_{{iteration}}_sxs.png
+          echo "compare/iteration_{{iteration}}_sxs.png"
+        output: "sxs_image_path"
+        timeout: 120
+        
+      # =========================================================================
+      # LOOP STEP 3: Generate Visual Annotations
+      # =========================================================================
+      - id: "generate-annotations"
+        agent: "foundation:explorer"
+        prompt: |
+          Use the nano-banana tool to generate visual annotations comparing the mockup to implementation:
+          
+          Input image: {{sxs_image_path}}
+          Reference image: {{original_mockup_path}}
+          Output: compare/iteration_{{iteration}}_annotated.png
+          
+          Run: nano-banana generate with reference_image_path={{original_mockup_path}}
+          
+          The tool will add visual annotations highlighting discrepancies between the mockup and implementation.
+          
+          Output the full path to the annotated image.
+        output: "annotated_image_path"
+        timeout: 300
+        
+      # =========================================================================
+      # LOOP STEP 4: Analyze Annotations (Extract Priority Fixes)
+      # =========================================================================
+      - id: "analyze-annotations"
+        agent: "foundation:zen-architect"
+        mode: "ANALYZE"
+        prompt: |
+          Use the nano-banana tool to analyze the annotated image and extract actionable insights:
+          
+          Input image: {{annotated_image_path}}
+          
+          Run: nano-banana analyze
+          
+          Parse the output JSON to extract:
+          1. overall_match_percentage (number between 0-100)
+          2. top_3_priority_fixes (array of fix objects with component, problem, fix_needed)
+          
+          Output ONLY valid JSON in this exact format:
+          {
+            "overall_match_percentage": 87,
+            "top_3_priority_fixes": [
+              {
+                "priority": 1,
+                "component": "Header",
+                "problem": "Font size is 18px instead of 16px",
+                "fix_needed": "Change font-size from 18px to 16px in Header.css"
+              },
+              {
+                "priority": 2,
+                "component": "Button",
+                "problem": "Border radius is 4px instead of 8px",
+                "fix_needed": "Update border-radius to 8px in Button.css"
+              },
+              {
+                "priority": 3,
+                "component": "Spacing",
+                "problem": "Padding is 12px instead of 16px",
+                "fix_needed": "Increase padding to 16px"
+              }
+            ]
+          }
+        output: "analysis_result"
+        parse_json: true
+        timeout: 300
+        
+      # =========================================================================
+      # LOOP STEP 5: Report Progress
+      # =========================================================================
+      - id: "report-progress"
+        agent: "foundation:zen-architect"
+        mode: "ANALYZE"
+        prompt: |
+          Generate a progress report for iteration {{iteration}}:
+          
+          Analysis Result: {{analysis_result}}
+          
+          Display:
+          - 🔄 Iteration: {{iteration}} of {{max_iterations}}
+          - 📊 Match Percentage: {{analysis_result.overall_match_percentage}}%
+          - 🎯 Target: {{target_match_percentage}}%
+          - 📁 Annotated Image: {{annotated_image_path}}
+          
+          Priority 1 Fix:
+          - Component: {{analysis_result.top_3_priority_fixes[0].component}}
+          - Problem: {{analysis_result.top_3_priority_fixes[0].problem}}
+          - Fix Needed: {{analysis_result.top_3_priority_fixes[0].fix_needed}}
+          
+          Check if target reached and provide clear status message.
+        output: "progress_report"
+        timeout: 120
+        
+      # =========================================================================
+      # LOOP STEP 6: Human-in-Loop Fix Application
+      # =========================================================================
+      - id: "apply-fix-pause"
+        type: "bash"
+        command: |
+          echo ""
+          echo "=============================================="
+          echo "📋 Iteration {{iteration}} - Apply Priority 1 Fix"
+          echo "=============================================="
+          echo ""
+          echo "Current Match: {{analysis_result.overall_match_percentage}}%"
+          echo "Target Match: {{target_match_percentage}}%"
+          echo ""
+          echo "Priority 1 Fix Details:"
+          echo "  Component: {{analysis_result.top_3_priority_fixes[0].component}}"
+          echo "  Problem: {{analysis_result.top_3_priority_fixes[0].problem}}"
+          echo "  Fix: {{analysis_result.top_3_priority_fixes[0].fix_needed}}"
+          echo ""
+          echo "Review annotated image: {{annotated_image_path}}"
+          echo ""
+          echo "Action Required:"
+          echo "  1. Apply the Priority 1 fix to your code"
+          echo "  2. Ensure dev server is running at {{implementation_url}}"
+          echo "  3. Verify the change in your browser"
+          echo "  4. Press ENTER to continue to next iteration"
+          echo ""
+          read -p "Press ENTER when ready to capture next screenshot..."
+          echo ""
+          echo "Continuing to next iteration..."
+        timeout: 3600  # 1 hour to apply fix
+        condition: "{{analysis_result.overall_match_percentage}} < {{target_match_percentage}}"
+        
+      # =========================================================================
+      # LOOP STEP 7: Update Context for Next Iteration
+      # =========================================================================
+      - id: "update-loop-state"
+        agent: "foundation:zen-architect"
+        mode: "ANALYZE"
+        prompt: |
+          Calculate the loop state for the next iteration.
+          
+          Current iteration: {{iteration}}
+          Current match: {{analysis_result.overall_match_percentage}}%
+          
+          Return JSON with:
+          {
+            "next_iteration": {{iteration}} + 1,
+            "current_match_percentage": {{analysis_result.overall_match_percentage}}
+          }
+        output: "loop_state"
+        parse_json: true
+        timeout: 60
+
+  # =============================================================================
+  # FINAL STEP: Completion Summary
+  # =============================================================================
+  - id: "final-summary"
+    agent: "foundation:zen-architect"
+    mode: "ANALYZE"
+    prompt: |
+      Generate a final summary of the screenshot comparison convergence:
+      
+      - Total iterations: {{iteration}}
+      - Final match percentage: {{match_percentage}}%
+      - Target: {{target_match_percentage}}%
+      
+      Provide clear success/completion status and next steps if needed.
+    timeout: 120
+
+# =============================================================================
+# USAGE
+# =============================================================================
+#
+# Execute with:
+#   amplifier recipes execute screenshot-comparison-loop.yaml \
+#     with original_mockup_path=designs/mockup.png \
+#     implementation_url=http://localhost:5173
+#
+# Optional parameters:
+#   viewport_width=390 \
+#   viewport_height=844 \
+#   target_match_percentage=95 \
+#   max_iterations=10
+#
+# The recipe will:
+# 1. Capture screenshot of implementation
+# 2. Create side-by-side comparison with mockup
+# 3. Generate visual annotations using nano-banana
+# 4. Analyze annotations to get match percentage and priority fixes
+# 5. Report progress and show top priority fix
+# 6. PAUSE and wait for developer to apply the fix (press ENTER to continue)
+# 7. Update loop state and return to step 1
+# 8. Loop exits when match >= target or max iterations reached
+# 9. Display final summary
+#
+# Note: The recipe pauses at step 6 each iteration. You MUST:
+# - Apply the suggested fix to your code
+# - Verify it works in your browser
+# - Press ENTER in the terminal to continue
+#
+# =============================================================================
