@@ -11,11 +11,13 @@ tools:
 
 # Declare our specialist agents
 agents:
-  mockup-analyzer: ui-mockup:agents/mockup-analyzer
-  font-matcher: ui-mockup:agents/font-matcher
-  detail-refiner: ui-mockup:agents/detail-refiner
-  implementation-validator: ui-mockup:agents/implementation-validator
+  include:
+    - ui-mockup:mockup-analyzer
+    - ui-mockup:font-matcher
+    - ui-mockup:detail-refiner
+    - ui-mockup:implementation-validator
 
 # Inject thin awareness pointer into root sessions
 context:
-  - ui-mockup:context/ui-mockup-awareness.md
+  include:
+    - ui-mockup:context/ui-mockup-awareness.md
