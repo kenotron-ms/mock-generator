@@ -47,6 +47,9 @@ context:
   target_match_percentage: "95"      # Stop when match reaches this threshold
   max_iterations: "10"               # Safety limit to prevent infinite loops
   
+  # Standard output location
+  output_dir: ".amplifier/screenshots"  # All screenshots and comparisons go here
+  
   # Loop state variables (initialized)
   iteration: "1"                     # Current iteration number
   match_percentage: "0"              # Current match percentage from analysis
@@ -75,12 +78,12 @@ steps:
       - id: "capture-screenshot"
         type: "bash"
         command: |
-          mkdir -p screenshots
+          mkdir -p {{output_dir}}/iteration_{{iteration}}
           npx playwright screenshot \
             --viewport-size={{viewport_width}},{{viewport_height}} \
             {{implementation_url}} \
-            screenshots/iteration_{{iteration}}.png
-          echo "screenshots/iteration_{{iteration}}.png"
+            {{output_dir}}/iteration_{{iteration}}/screenshot.png
+          echo "{{output_dir}}/iteration_{{iteration}}/screenshot.png"
         output: "screenshot_path"
         timeout: 300
         
@@ -90,12 +93,11 @@ steps:
       - id: "create-side-by-side"
         type: "bash"
         command: |
-          mkdir -p compare
           montage -geometry +0+0 -tile 2x1 -background white \
             {{original_mockup_path}} \
             {{screenshot_path}} \
-            compare/iteration_{{iteration}}_sxs.png
-          echo "compare/iteration_{{iteration}}_sxs.png"
+            {{output_dir}}/iteration_{{iteration}}/sxs.png
+          echo "{{output_dir}}/iteration_{{iteration}}/sxs.png"
         output: "sxs_image_path"
         timeout: 120
         
@@ -108,10 +110,9 @@ steps:
           Use the nano-banana tool to generate visual annotations comparing the mockup to implementation:
           
           Input image: {{sxs_image_path}}
-          Reference image: {{original_mockup_path}}
-          Output: compare/iteration_{{iteration}}_annotated.png
+          Output: {{output_dir}}/iteration_{{iteration}}/annotated.png
           
-          Run: nano-banana generate with reference_image_path={{original_mockup_path}}
+          Run: nano-banana generate with reference_image_path={{sxs_image_path}}
           
           The tool will add visual annotations highlighting discrepancies between the mockup and implementation.
           
@@ -256,9 +257,59 @@ steps:
       - Total iterations: {{iteration}}
       - Final match percentage: {{match_percentage}}%
       - Target: {{target_match_percentage}}%
+      - Output directory: {{output_dir}}
       
       Provide clear success/completion status and next steps if needed.
     timeout: 120
+    
+  # =============================================================================
+  # CLEANUP STEP: Remove Intermediate Files
+  # =============================================================================
+  - id: "cleanup-intermediate-files"
+    type: "bash"
+    command: |
+      echo ""
+      echo "🧹 Cleaning up intermediate files..."
+      
+      # Keep only the final iteration and the very first iteration
+      FINAL_ITERATION={{iteration}}
+      
+      # Remove intermediate iterations (keep 1 and final)
+      for i in $(seq 2 $((FINAL_ITERATION - 1))); do
+        if [ -d "{{output_dir}}/iteration_$i" ]; then
+          # Keep only the annotated.png from intermediate iterations
+          if [ -f "{{output_dir}}/iteration_$i/annotated.png" ]; then
+            mv "{{output_dir}}/iteration_$i/annotated.png" "{{output_dir}}/iteration_${i}_annotated.png"
+          fi
+          # Remove the directory
+          rm -rf "{{output_dir}}/iteration_$i"
+          echo "  Cleaned: iteration $i (kept annotated image only)"
+        fi
+      done
+      
+      # Create a summary manifest
+      cat > {{output_dir}}/MANIFEST.md << 'MANIFEST_EOF'
+      # Screenshot Comparison Results
+      
+      Date: $(date)
+      Final Match: {{match_percentage}}%
+      Iterations: {{iteration}}
+      
+      ## Files Preserved
+      
+      - iteration_1/ - Initial state (baseline)
+      - iteration_${FINAL_ITERATION}/ - Final state (best match)
+      - iteration_*_annotated.png - Annotated comparisons from each iteration
+      
+      ## Cleanup Actions
+      
+      Removed intermediate screenshot.png and sxs.png files to save space.
+      Kept all annotated comparison images for review.
+      MANIFEST_EOF
+      
+      echo "✅ Cleanup complete. See {{output_dir}}/MANIFEST.md for details."
+      echo "📁 Preserved files in: {{output_dir}}/"
+    timeout: 60
 
 # =============================================================================
 # USAGE
